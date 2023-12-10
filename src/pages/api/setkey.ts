@@ -2,14 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from './auth/[...nextauth]'
 import eccrypto from 'eccrypto'
-import { PrismaClient } from '@prisma/client';
+import {createECDSAKey, getECDSAKey, getUserByEmail} from "@/lib/db";
 
 export type ECDSAKey = {
   privateKey: string,
   publicKey: string
 }
 
-const prisma = new PrismaClient();
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,36 +31,3 @@ export default async function handler(
 }
 
 
-async function getUserByEmail(email: string) {
-  return await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
-}
-
-async function getECDSAKey(userId: string) {
-  return await prisma.eCDSAKey.findUnique({
-    where: {
-      userId,
-    },
-  });
-}
-
-async function deleteECDSAKey(userId: string) {
-  return await prisma.eCDSAKey.delete({
-    where: {
-      userId,
-    },
-  });
-}
-
-async function createECDSAKey(userId: string, privateKey: string, publicKey: string) {
-  return await prisma.eCDSAKey.create({
-    data: {
-      userId,
-      privateKey,
-      publicKey
-    },
-  });
-}
